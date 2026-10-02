@@ -1,0 +1,88 @@
+.syllabus-menu {
+  --syllabus-blue: #205fe8;
+  --syllabus-teal: #078ca7;
+  --syllabus-ink: #14294d;
+  --syllabus-muted: #526984;
+  --syllabus-line: #d8e5f2;
+  width: min(100%, 1360px);
+  margin: 0 auto;
+  padding: 12px 0 40px;
+  color: var(--syllabus-ink);
+}
+.syllabus-menu *, .syllabus-menu *::before, .syllabus-menu *::after { box-sizing: border-box; }
+.syllabus-hero { position: relative; min-height: 218px; display: flex; align-items: center; justify-content: space-between; overflow: hidden; padding: clamp(24px, 4vw, 48px); border: 1px solid #cbdff2; border-radius: 28px; background: linear-gradient(112deg, #fff 0%, #f5faff 62%, #e9f5ff 100%); box-shadow: 0 16px 38px rgba(25,57,102,.08); }
+.syllabus-hero-copy { position: relative; z-index: 1; max-width: 760px; }
+.syllabus-eyebrow { display: flex; align-items: center; gap: 9px; margin: 0 0 10px; color: #627b96; font-size: 11px; font-weight: 820; letter-spacing: .12em; }
+.syllabus-eyebrow span { color: #1559d4; }
+.syllabus-eyebrow i { width: 7px; height: 7px; border-radius: 50%; background: #ef6858; box-shadow: 0 0 0 4px #fff0ed; }
+.syllabus-hero h1 { margin: 0; color: var(--syllabus-ink); font-size: clamp(34px, 4.4vw, 54px); line-height: 1.03; letter-spacing: -.055em; }
+.syllabus-hero-copy > p:last-child { max-width: 640px; margin: 12px 0 0; color: #506782; font-size: 16px; line-height: 1.5; }
+.syllabus-hero-art { position: relative; width: 176px; height: 150px; flex: 0 0 176px; display: grid; place-items: center; margin-right: 2%; color: #205fe8; }
+.syllabus-hero-art > svg { position: relative; z-index: 2; width: 42px; height: 42px; padding: 9px; border: 1px solid #b7d4f2; border-radius: 16px; color: #1659d4; background: #fff; box-shadow: 0 8px 20px rgba(25,57,102,.12); }
+.syllabus-orbit { position: absolute; width: 146px; height: 58px; border: 1.5px solid rgba(32,95,232,.35); border-radius: 50%; }
+.syllabus-orbit.orbit-a { transform: rotate(36deg); }
+.syllabus-orbit.orbit-b { transform: rotate(-36deg); border-color: rgba(7,140,167,.35); }
+.syllabus-orb { position: absolute; width: 12px; height: 12px; border: 2px solid #fff; border-radius: 50%; box-shadow: 0 2px 7px rgba(25,57,102,.18); }
+.syllabus-orb.orb-blue { top: 25px; left: 42px; background: #205fe8; }
+.syllabus-orb.orb-coral { right: 24px; bottom: 40px; background: #ef6858; }
+.syllabus-orb.orb-gold { right: 48px; top: 23px; background: #efb317; }
+.syllabus-section-jump { display: flex; align-items: center; gap: 7px; overflow-x: auto; margin: 15px 0 26px; padding: 6px; border: 1px solid var(--syllabus-line); border-radius: 16px; background: rgba(255,255,255,.86); scrollbar-width: thin; }
+.syllabus-section-jump a { min-height: 40px; display: inline-flex; flex: 1 0 auto; align-items: center; gap: 8px; padding: 0 12px; border: 1px solid transparent; border-radius: 11px; color: #47617f; text-decoration: none; font-size: 12px; font-weight: 720; white-space: nowrap; }
+.syllabus-section-jump a:hover { border-color: #c8dcf0; color: #174f9e; background: #f2f8ff; }
+.syllabus-section-jump a span { display: inline-grid; place-items: center; min-width: 35px; height: 25px; padding: 0 6px; border-radius: 8px; color: #1559d4; background: #e7f2ff; font-size: 11px; font-weight: 850; }
+.syllabus-sections { display: grid; gap: 25px; }
+.syllabus-group { scroll-margin-top: 20px; }
+.syllabus-group-heading { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; padding: 0 2px 11px; border-bottom: 1px solid #dce8f4; }
+.syllabus-group-icon { width: 40px; height: 40px; display: grid; flex: 0 0 40px; place-items: center; border: 1px solid #c7ddf3; border-radius: 13px; color: #205fe8; background: #eef6ff; }
+.syllabus-group-4-2 .syllabus-group-icon { color: #078ca7; background: #eaf9fc; border-color: #c2e6ec; }
+.syllabus-group-4-3 .syllabus-group-icon { color: #7055dc; background: #f1efff; border-color: #d9d2f5; }
+.syllabus-group-4-4 .syllabus-group-icon { color: #ef6858; background: #fff1ee; border-color: #f3d0ca; }
+.syllabus-group-4-5 .syllabus-group-icon { color: #a76c00; background: #fff8e5; border-color: #f0dfae; }
+.syllabus-group-heading p { margin: 0 0 2px; color: #69809a; font-size: 10px; font-weight: 850; letter-spacing: .12em; }
+.syllabus-group-heading h2 { margin: 0; color: var(--syllabus-ink); font-size: 23px; line-height: 1.15; letter-spacing: -.035em; }
+.syllabus-card-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 11px; }
+.syllabus-card { min-width: 0; display: flex; flex-direction: column; padding: 17px 18px 15px; border: 1px solid #d9e5f2; border-radius: 18px; background: rgba(255,255,255,.94); box-shadow: 0 7px 20px rgba(25,57,102,.045); transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease; }
+.syllabus-card:hover { border-color: #bcd4ec; box-shadow: 0 10px 24px rgba(25,57,102,.085); transform: translateY(-1px); }
+.syllabus-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.syllabus-outcome-number { display: inline-flex; align-items: center; min-height: 25px; padding: 0 8px; border-radius: 8px; color: #1559d4; background: #eaf3ff; font-size: 11px; font-weight: 850; letter-spacing: .015em; }
+.syllabus-order { color: #a3b2c4; font-size: 11px; font-weight: 750; font-variant-numeric: tabular-nums; }
+.syllabus-card h3 { margin: 10px 0 7px; color: #18365f; font-size: 17px; line-height: 1.28; letter-spacing: -.025em; }
+.syllabus-wording { margin: 0; color: #324f71; font-size: 13px; line-height: 1.48; }
+.syllabus-formula { align-self: flex-start; margin: 9px 0 0; padding: 6px 10px; border: 1px solid #b8d5f2; border-radius: 9px; color: #184e98; background: #edf6ff; font-size: 15px; font-weight: 790; letter-spacing: .015em; }
+.syllabus-activity-note { margin: 9px 0 12px; color: #637b95; font-size: 11px; line-height: 1.42; }
+.syllabus-activities { display: flex; flex-wrap: wrap; gap: 7px; margin-top: auto; padding-top: 11px; border-top: 1px solid #e5edf6; }
+.syllabus-activities a { min-height: 35px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 0 10px; border: 1px solid #b9d3ef; border-radius: 10px; color: #164f9e; text-decoration: none; background: #f3f8ff; font-size: 11px; font-weight: 760; }
+.syllabus-activities a:first-child { border-color: #205fe8; color: #fff; background: #205fe8; }
+.syllabus-activities a:hover { filter: brightness(.97); }
+.syllabus-extras { display: grid; grid-template-columns: 44px minmax(0,1fr) auto; align-items: center; gap: 13px; margin-top: 28px; padding: 18px 19px; border: 1px solid #d7d1f3; border-radius: 19px; background: linear-gradient(105deg,#fff 0%,#f4f2ff 100%); }
+.syllabus-extra-mark { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 13px; color: #7055dc; background: #ebe8ff; }
+.syllabus-extra-copy > span { color: #6958b2; font-size: 9px; font-weight: 850; letter-spacing: .1em; }
+.syllabus-extra-copy h2 { margin: 4px 0 3px; color: #312a5d; font-size: 17px; line-height: 1.25; }
+.syllabus-extra-copy p { margin: 0; color: #5f5d78; font-size: 12px; line-height: 1.4; }
+.syllabus-extra-links { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
+.syllabus-extra-links a { min-height: 36px; display: inline-flex; align-items: center; gap: 7px; padding: 0 10px; border: 1px solid #c8c1ec; border-radius: 10px; color: #5342a7; text-decoration: none; background: #fff; font-size: 11px; font-weight: 730; }
+.syllabus-footer { margin: 14px 2px 0; color: #637b95; font-size: 11px; line-height: 1.45; }
+
+@media (max-width: 760px) {
+  .syllabus-hero { min-height: 200px; padding: 25px; }
+  .syllabus-hero-art { width: 120px; flex-basis: 120px; margin-right: 0; transform: scale(.82); }
+  .syllabus-card-grid { grid-template-columns: 1fr; }
+  .syllabus-extras { grid-template-columns: 42px minmax(0,1fr); }
+  .syllabus-extra-links { grid-column: 1 / -1; justify-content: flex-start; padding-left: 55px; }
+}
+@media (max-width: 520px) {
+  .syllabus-menu { padding-top: 7px; }
+  .syllabus-hero { min-height: 185px; align-items: flex-start; padding: 21px 17px; border-radius: 21px; }
+  .syllabus-hero-copy { max-width: calc(100% - 72px); }
+  .syllabus-hero h1 { font-size: 34px; }
+  .syllabus-hero-copy > p:last-child { margin-top: 9px; font-size: 13px; }
+  .syllabus-hero-art { position: absolute; right: -26px; bottom: 7px; width: 112px; height: 100px; transform: scale(.7); transform-origin: center; }
+  .syllabus-eyebrow { gap: 6px; font-size: 9px; }
+  .syllabus-section-jump { margin: 10px 0 21px; }
+  .syllabus-section-jump a { min-height: 37px; padding: 0 8px; font-size: 11px; }
+  .syllabus-group-heading h2 { font-size: 20px; }
+  .syllabus-card { padding: 15px 14px 13px; }
+  .syllabus-card h3 { font-size: 16px; }
+  .syllabus-wording { font-size: 12px; }
+  .syllabus-extra-links { padding-left: 0; }
+}
