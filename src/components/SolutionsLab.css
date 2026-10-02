@@ -177,6 +177,7 @@
 .slab-particle-key i.sodium-key { background: #8c58d9; }
 .slab-particle-key i.potassium-key { background: #b770ce; }
 .slab-particle-key i.chloride-key { background: #54ad58; }
+.slab-particle-key i.hydration-key { background: rgba(127,224,236,.35); box-shadow: inset 0 0 0 2px #7fe0ec; }
 .slab-particle-key i.solute-key { background: #e5a43c; }
 .slab-particle-panel > small { display: block; margin-top: 7px; color: #74869b; font-size: 11px; }
 

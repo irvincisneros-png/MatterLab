@@ -87,7 +87,7 @@ test('4.4.3 keeps a free choice of separation property with apparatus for each t
     [/^Filter/, 'filter', /Retort stand and ring clamp holding a glass funnel/],
     [/^Sieve/, 'sieve', /mesh sieve resting on the rim of a glass bowl/],
     [/^Magnet/, 'magnet', /bar magnet/],
-    [/^Settle/, 'settle-decant', /tilted on a wedge/],
+    [/^Settle/, 'settle-decant', /tipped onto a wedge/],
     [/^Evaporate/, 'evaporate', /evaporating basin on a gauze and tripod/],
     [/^Distil/, 'distill', /Liebig condenser/],
   ];

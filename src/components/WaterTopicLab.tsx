@@ -24,6 +24,7 @@ import {
 import { advanceModelTime, deriveMoleculePositions, PARTICLE_COUNT, SAMPLE_MASS_KG, thermalStateAtEnergy, type Phase, type PhaseFractions } from '../science/matterEngine';
 import './WaterTopicLab.css';
 import { watchContextLoss } from './scene/contextLoss';
+import { AdaptiveQuality } from './scene/AdaptiveQuality';
 
 export type { WaterTopicMode } from '../science/waterTopicEngine';
 export type WaterTopicLabProps = { initialMode?: WaterTopicMode; onModeChange?: (mode: WaterTopicMode) => void };
@@ -406,7 +407,7 @@ function WaterCanvas({
       <WaterCanvasAccessibility description={sceneDescription} />
       <WaterWorld mode={mode} cycle={cycle} heating={heating} heaterOn={heaterOn} propertiesFocus={propertiesFocus} waterTemperatureC={waterTemperatureC} buoyancy={buoyancy} surfacePlacement={surfacePlacement} detergent={detergent} liquidSample={liquidSample} liquidVolumeMl={liquidVolumeMl} liquidMassG={liquidMassG} liquidBalanceTared={liquidBalanceTared} objectForm={objectForm} objectVolumeCm3={objectVolumeCm3} visualTime={visualTime} showMolecules={showMolecules} reducedMotion={reducedMotion} />
       <WaterCamera mode={mode} resetId={resetId} reducedMotion={reducedMotion} />
-    </Canvas>
+    <AdaptiveQuality /></Canvas>
   </WaterGraphicsBoundary>;
 }
 

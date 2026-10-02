@@ -26,6 +26,7 @@ import {
 } from '../science/advancedMatterEngine';
 import './AdvancedLab.css';
 import { watchContextLoss } from './scene/contextLoss';
+import { AdaptiveQuality } from './scene/AdaptiveQuality';
 
 export type { AdvancedExperiment } from '../science/advancedMatterEngine';
 
@@ -451,7 +452,7 @@ export function AdvancedLab({ initialExperiment = 'plasma', onExperimentChange }
                 watchContextLoss(canvas, () => { setGraphicsFailed(true); setCanvasReady(false); });
               }} fallback={null}>
                 {experiment === 'plasma' ? <PlasmaWorld state={plasma} particles={plasmaView} /> : <BecWorld state={bec} atoms={becView} />}
-              </Canvas>
+              <AdaptiveQuality /></Canvas>
             </ErrorBoundary>}
             {graphicsFailed && <>
               <TwoDimensionalView experiment={experiment} plasma={plasma} bec={bec} plasmaView={plasmaView} becView={becView} />

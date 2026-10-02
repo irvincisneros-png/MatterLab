@@ -30,6 +30,7 @@ import {
 } from '../science/pollutionEngine';
 import './PollutionLab.css';
 import { watchContextLoss } from './scene/contextLoss';
+import { AdaptiveQuality } from './scene/AdaptiveQuality';
 
 type WaterMarker = { id: string; kind: PollutantId | 'sodium-ion' | 'chloride-ion'; position: readonly [number, number, number] };
 
@@ -269,7 +270,7 @@ export function PollutionLab(): ReactElement {
         <section className="plab-scene-panel" aria-label="Water body and treatment bench">
           <div className="plab-scene-head"><div><span className="plab-kicker">POLLUTANTS ENTER THE WATER</span><h1>What stays in the water?</h1></div><span className="plab-clarity"><Gauge size={15} /> clarity <b>{clarity}%</b></span></div>
           <div className="plab-canvas-wrap" data-graphics={canvasReady && !graphicsFailed ? 'ready' : graphicsFailed ? 'fallback' : 'starting'}>
-            {!graphicsFailed && <ErrorBoundary key={canvasKey} onFailure={() => { setGraphicsFailed(true); setCanvasReady(false); }}><Canvas key={canvasKey} className="plab-canvas" camera={{ position: [3.4, 6, 12], fov: 24, near: 0.1, far: 160 }} dpr={[1, 1.6]} gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }} onCreated={({ gl }) => { setCanvasReady(true); setGraphicsFailed(false); watchContextLoss(gl.domElement, () => { setGraphicsFailed(true); setCanvasReady(false); }); }} fallback={null}><PollutionWorld state={state} particleView={particleView} viewRevision={canvasKey} overlay={overlayRef} /></Canvas></ErrorBoundary>}
+            {!graphicsFailed && <ErrorBoundary key={canvasKey} onFailure={() => { setGraphicsFailed(true); setCanvasReady(false); }}><Canvas key={canvasKey} className="plab-canvas" camera={{ position: [3.4, 6, 12], fov: 24, near: 0.1, far: 160 }} dpr={[1, 1.6]} gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }} onCreated={({ gl }) => { setCanvasReady(true); setGraphicsFailed(false); watchContextLoss(gl.domElement, () => { setGraphicsFailed(true); setCanvasReady(false); }); }} fallback={null}><PollutionWorld state={state} particleView={particleView} viewRevision={canvasKey} overlay={overlayRef} /><AdaptiveQuality /></Canvas></ErrorBoundary>}
             {!graphicsFailed && <PollutionTags state={state} overlayRef={overlayRef} />}
             {graphicsFailed && <><PollutionFallback state={state} markers={markers} particleView={particleView} /><button className="plab-retry" type="button" onClick={retryGraphics}>Try 3D again</button></>}
             <div className="plab-scene-hud"><b>{remainingTotalPollutantG(state).toFixed(1)} g</b><i /> <span>pollutant mass remains</span><small>{salt.toFixed(1)} g dissolved salt</small></div>

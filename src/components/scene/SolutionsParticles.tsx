@@ -22,7 +22,7 @@ export type Vec3 = readonly [number, number, number];
 export type Quat4 = readonly [number, number, number, number];
 export type Item = { p: Vec3; s: number; q?: Quat4 };
 export type CationKind = 'sodium' | 'potassium';
-export type ParticleModel = { cations: Item[]; anions: Item[]; sucrose: Item[]; sand: Item[]; waters: Item[]; bonds: Item[] };
+export type ParticleModel = { cations: Item[]; anions: Item[]; sucrose: Item[]; sand: Item[]; waters: Item[]; bonds: Item[]; halos: Item[] };
 
 export const FLOOR_Y = -0.918;
 const TAU = Math.PI * 2;
@@ -41,7 +41,7 @@ const frac = (value: number) => value - Math.floor(value);
 const smooth = (t: number) => { const c = Math.min(1, Math.max(0, t)); return c * c * (3 - 2 * c); };
 const SEED = (id: number, lane: number) => frac(Math.sin((id + 1) * 78.233 + lane * 32.53) * 43758.5453);
 
-const emptyModel = (): ParticleModel => ({ cations: [], anions: [], sucrose: [], sand: [], waters: [], bonds: [] });
+const emptyModel = (): ParticleModel => ({ cations: [], anions: [], sucrose: [], sand: [], waters: [], bonds: [], halos: [] });
 
 /* ---------- lattice sites ---------- */
 
@@ -138,7 +138,7 @@ const HEX_DIRECTIONS = (spacing: number, ringLimit: number): [number, number][] 
 };
 const HEX_ION = HEX_DIRECTIONS(0.3, 2);
 const HEX_SUCROSE = HEX_DIRECTIONS(0.34, 1);
-const COARSE_RING_RADIUS = [0, 0, 0.3, 0.38, 0.4];
+const COARSE_RING_RADIUS = [0, 0, 0.3, 0.34, 0.36];
 
 function crystalCentre(fine: boolean, ionic: boolean, index: number, count: number): [number, number] {
   if (fine) {
@@ -175,7 +175,7 @@ export function planSolid(state: SolutionsState, particleView: boolean): SolidPl
   const spec = ionic
     ? fine
       ? { spacing: ION_SPACING, scale: 1, maxEdge: 2, maxCount: 14, perCap: 8, count: Math.max(3, Math.ceil(undissolved / 1.5)), total: Math.ceil(undissolved * 8) }
-      : { spacing: ION_SPACING, scale: 1, maxEdge: 4, maxCount: 3, perCap: 64, count: Math.ceil(undissolved / 9), total: Math.ceil(undissolved * 8) }
+      : { spacing: ION_SPACING, scale: 1, maxEdge: 5, maxCount: 3, perCap: 125, count: Math.ceil(undissolved / 9), total: Math.ceil(undissolved * 8) }
     : fine
       ? { spacing: SUCROSE_SPACING, scale: SUCROSE_SCALE, maxEdge: 2, maxCount: 7, perCap: 3, count: Math.max(3, Math.ceil(undissolved / 4)), total: Math.ceil(undissolved / 2) }
       : { spacing: SUCROSE_SPACING, scale: SUCROSE_SCALE, maxEdge: 2, maxCount: 3, perCap: 8, count: Math.ceil(undissolved / 10), total: Math.ceil(undissolved / 3) };
@@ -190,7 +190,7 @@ export function planSolid(state: SolutionsState, particleView: boolean): SolidPl
     const edge = Math.min(spec.maxEdge, Math.max(1, Math.ceil(Math.cbrt(share - 1e-9))));
     const [cx, cz] = crystalCentre(fine, ionic, index, count);
     crystals.push({
-      cx, cz, yaw: (SEED(index, 60) - 0.5) * (fine ? 2.4 : 0.9), edge, share, spacing: spec.spacing, scale: spec.scale,
+      cx, cz, yaw: (SEED(index, 60) - 0.5) * (fine ? 2.4 : 0.5), edge, share, spacing: spec.spacing, scale: spec.scale,
       baseY: FLOOR_Y + (ionic ? ANION_RADIUS : spec.spacing * 0.46), ionic, order: orderedSites(edge),
     });
   }
@@ -356,8 +356,10 @@ export function buildDynamicModel(state: SolutionsState, plan: SolidPlan, partic
         [outward[0] * 0.5, 1, outward[2] * 0.5],
         [outward[0] + side[0] * 0.9, 0.15, outward[2] + side[2] * 0.9],
         [outward[0] - side[0] * 0.9, -0.25, outward[2] - side[2] * 0.9],
+        [-outward[0] * 0.8, -0.55, -outward[2] * 0.8],
       ];
       const distance = cation ? radius + 0.085 : radius + 0.1;
+      model.halos.push({ p, s: (distance + 0.11) * shell });
       directions.forEach((direction, k) => {
         const length = Math.hypot(...direction);
         const rotated: Vec3 = [
@@ -493,6 +495,7 @@ export function ParticleLayer({ model, cationKind }: { model: ParticleModel; cat
     <Instances items={model.sucrose} geometry={g.hydrogen} material={material('hydrogen', physical(ATOM_COLOURS.hydrogen))} capacity={120} />
     <Instances items={model.sucrose} geometry={g.bonds} material={material('bond', () => new THREE.MeshStandardMaterial({ color: '#b5c0cc', roughness: 0.42 }))} capacity={120} />
     <Instances items={model.sand} geometry={g.grain} material={material('sand', () => new THREE.MeshStandardMaterial({ color: SAND_COLOUR, roughness: 0.85, flatShading: true }))} capacity={400} />
+    <Instances items={model.halos} geometry={g.sphere} material={material('hydration-halo', () => new THREE.MeshBasicMaterial({ color: '#7fe0ec', transparent: true, opacity: 0.22, depthWrite: false }))} capacity={24} />
     <Instances items={model.waters} geometry={g.waterO} material={material('oxygen', physical(ATOM_COLOURS.oxygen))} capacity={160} />
     <Instances items={model.waters} geometry={g.waterH} material={material('hydrogen', physical(ATOM_COLOURS.hydrogen))} capacity={160} />
     <Instances items={model.waters} geometry={g.waterBond} material={material('water-bond', () => new THREE.MeshStandardMaterial({ color: '#d5e0ea', roughness: 0.32 }))} capacity={160} />

@@ -1,4 +1,5 @@
-import { useLayoutEffect, useMemo, useRef, type ReactElement, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactElement, type ReactNode } from 'react';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { ATOM_COLOURS, LabBeaker, LabBench, LabBond, LabWaterMolecule } from './LabPrimitives';
 import { SEPARATION_MATERIALS, type SeparationMaterialId, type SeparationOutput, type SeparationState, type SeparationTechnique } from '../../science/mixturesEngine';
@@ -33,8 +34,8 @@ export const SEPARATION_FRAMES: Readonly<Record<SeparationTechnique, StageFrame>
 export const APPARATUS_DESCRIPTION: Readonly<Record<SeparationTechnique, string>> = {
   filter: 'Retort stand and ring clamp holding a glass funnel lined with a folded filter-paper cone, its stem inside a receiving beaker.',
   sieve: 'A mesh sieve resting on the rim of a glass bowl.',
-  magnet: 'A bar magnet on the bench next to the sample beaker.',
-  'settle-decant': 'A beaker tilted on a wedge, pouring the clear upper liquid into a second beaker and leaving the sediment behind.',
+  magnet: 'A bar magnet in a plastic sleeve, dipped into the sample to collect iron filings and lifted out again.',
+  'settle-decant': 'A beaker tipped onto a wedge so the clear upper liquid pours into a second beaker, leaving the sediment behind.',
   evaporate: 'An evaporating basin on a gauze and tripod over a Bunsen burner.',
   distill: 'A flask heated on a tripod, a clamped Liebig condenser and a receiving beaker.',
   dissolve: 'A beaker of sample with water being added and stirred.',
@@ -288,6 +289,36 @@ function useRigState(state: SeparationState, technique: SeparationTechnique) {
 
 const MIN_FUNNEL_Y = 0.12;
 
+const easeInOut = (t: number) => t * t * (3 - 2 * t);
+const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
+
+/**
+ * 0 → 1 over `seconds` each time `trigger` changes to a new action, so a
+ * technique is shown being carried out rather than jumping to its end state.
+ * Reduced motion skips straight to the end.
+ */
+function useActionProgress(trigger: unknown, seconds: number) {
+  const [progress, setProgress] = useState(1);
+  const start = useRef<number | null>(null);
+  const reduced = useMemo(() => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches, []);
+  useEffect(() => {
+    start.current = null;
+    setProgress(trigger && !reduced ? 0 : 1);
+  }, [trigger, reduced]);
+  useFrame(({ clock }) => {
+    if (progress >= 1) return;
+    if (start.current === null) start.current = clock.elapsedTime;
+    setProgress(clamp01((clock.elapsedTime - start.current) / seconds));
+  });
+  return progress;
+}
+
+function addMasses(a: Masses, b: Masses, scaleB: number): Masses {
+  const out: Partial<Record<SeparationMaterialId, number>> = { ...a };
+  for (const [id, mass] of Object.entries(b)) out[id as SeparationMaterialId] = (out[id as SeparationMaterialId] ?? 0) + (mass ?? 0) * scaleB;
+  return out;
+}
+
 function FilterRig({ state, modelTime }: RigProps) {
   const { justRan, latest, remaining } = useRigState(state, 'filter');
   const filtered = justRan && ((state.lastAction?.movedG ?? 0) > 0 || (remaining.water ?? 0) > 0);
@@ -392,13 +423,25 @@ function MagnetRig({ state, modelTime }: RigProps) {
       return { p: [centre.x, centre.y, centre.z], s: [1, length, 1], r: [euler.x, euler.y, euler.z] };
     });
   }, [attractedG]);
-  const feed: Masses = remaining;
+  const progress = useActionProgress(justRan ? state.lastAction : null, 3.6);
+  const beakerX = -1.3;
+  // Path: lift and carry (0–0.3), lower into the sample (0.3–0.45), hold (0.45–0.55), lift out (0.55–0.7), return (0.7–1).
+  const carry = easeInOut(clamp01(progress / 0.3)) * (1 - easeInOut(clamp01((progress - 0.7) / 0.3)));
+  const dip = easeInOut(clamp01((progress - 0.3) / 0.15)) * (1 - easeInOut(clamp01((progress - 0.55) / 0.15)));
+  const animating = justRan && attractedG > 0 && progress < 1;
+  const x = animating ? mx + (beakerX - mx) * carry : mx;
+  const y = animating ? bodyY + carry * 1.25 - dip * 0.95 : bodyY;
+  const upright = animating ? carry : 0;
+  const collected = !animating || progress >= 0.45;
+  // Until the magnet reaches the sample, the iron is still in the beaker.
+  const feed: Masses = animating && progress < 0.45 ? addMasses(remaining, { iron: attractedG }, 1) : remaining;
   return <group>
-    <Beaker x={-1.3} masses={feed} seed={2} modelTime={modelTime} />
-    <group position={[mx, bodyY, 0.1]} rotation={[0, -0.15, 0]}>
+    <Beaker x={beakerX} masses={feed} seed={2} modelTime={modelTime} />
+    <group position={[x, y, animating ? 0.1 * (1 - carry) : 0.1]} rotation={[0, -0.15 * (1 - upright), (Math.PI / 2) * upright]}>
+      <mesh><boxGeometry args={[1.26, 0.3, 0.3]} /><meshPhysicalMaterial color="#eef6fb" transparent opacity={0.22} roughness={0.2} depthWrite={false} /></mesh>
       <mesh position={[-0.28, 0, 0]}><boxGeometry args={[0.6, 0.24, 0.24]} /><meshStandardMaterial color="#e43d39" roughness={0.35} metalness={0.2} /></mesh>
       <mesh position={[0.32, 0, 0]}><boxGeometry args={[0.6, 0.24, 0.24]} /><meshStandardMaterial color="#c7d2de" roughness={0.3} metalness={0.5} /></mesh>
-      <Instances items={spikes}><cylinderGeometry args={[0.006, 0.012, 1, 6]} /><meshStandardMaterial color={SEPARATION_MATERIALS.iron.colour} roughness={0.35} metalness={0.7} /></Instances>
+      {collected && <Instances items={spikes}><cylinderGeometry args={[0.006, 0.012, 1, 6]} /><meshStandardMaterial color={SEPARATION_MATERIALS.iron.colour} roughness={0.35} metalness={0.7} /></Instances>}
     </group>
     {justRan && attractedG <= 0 && <mesh position={[mx, BENCH_Y + 0.003, 0.1]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.7, 0.72, 40]} /><meshBasicMaterial color="#9fb4c8" transparent opacity={0.4} /></mesh>}
     <RecoveredRow outputs={state.outputs} exclude={latest} />
@@ -408,7 +451,11 @@ function MagnetRig({ state, modelTime }: RigProps) {
 function DecantRig({ state, modelTime }: RigProps) {
   const { justRan, latest, remaining } = useRigState(state, 'settle-decant');
   const poured = justRan && !!latest;
-  const tilt = (40 * Math.PI) / 180;
+  const progress = useActionProgress(poured ? state.lastAction : null, 3.2);
+  const tiltFraction = easeInOut(clamp01(progress / 0.45));
+  const pourFraction = easeInOut(clamp01((progress - 0.35) / 0.6));
+  const tilt = (40 * Math.PI) / 180 * tiltFraction;
+  const wedgeTilt = (40 * Math.PI) / 180;
   const pivotX = -0.95;
   const pivot: Vec3 = [pivotX + BEAKER_R, BENCH_Y, 0];
   const receiverX = pivot[0] + 1.08;
@@ -416,15 +463,20 @@ function DecantRig({ state, modelTime }: RigProps) {
     const shape = new THREE.Shape();
     const length = 0.86;
     shape.moveTo(0, 0);
-    shape.lineTo(-length * Math.cos(tilt), length * Math.sin(tilt));
-    shape.lineTo(-length * Math.cos(tilt), 0);
+    shape.lineTo(-length * Math.cos(wedgeTilt), length * Math.sin(wedgeTilt));
+    shape.lineTo(-length * Math.cos(wedgeTilt), 0);
     shape.closePath();
     return shape;
-  }, [tilt]);
+  }, [wedgeTilt]);
   const lipX = pivot[0] + BEAKER_H * Math.sin(tilt);
   const lipY = BENCH_Y + BEAKER_H * Math.cos(tilt);
   const receiverTop = BENCH_Y + 0.7;
-  const levelFraction = (remaining.water ?? 0) + (remaining.oil ?? 0);
+  // The decanted liquid leaves the tilted beaker and arrives in the receiver as the pour progresses.
+  const tilted: Masses = poured && latest ? addMasses(remaining, latest.massesG, 1 - pourFraction) : remaining;
+  const received: Masses = poured && latest ? addMasses(emptyMasses(), latest.massesG, pourFraction) : emptyMasses();
+  const levelFraction = (tilted.water ?? 0) + (tilted.oil ?? 0);
+  const surfaceY = BENCH_Y + 0.95 + (0.22 - 0.95) * Math.max(tiltFraction * 0.55, pourFraction);
+  const pouring = poured && progress > 0.35 && progress < 0.97;
   return <group>
     {!poured && <Beaker x={pivotX} masses={remaining} seed={2} modelTime={modelTime} />}
     {poured && <>
@@ -435,12 +487,12 @@ function DecantRig({ state, modelTime }: RigProps) {
       <group position={[...pivot]} rotation={[0, 0, -tilt]}>
         <group position={[-BEAKER_R, BEAKER_H / 2, 0]}>
           <LabBeaker radius={BEAKER_R} height={BEAKER_H} graduated capacityMl={100} particleLens position={[0, 0, 0]} />
-          <VesselContents masses={remaining} innerR={BEAKER_R - 0.03} floorY={-BEAKER_H / 2 + 0.09} maxLiquidH={BEAKER_H - 0.28} seed={2} liquidWorldY={levelFraction > 0 ? BENCH_Y + 0.22 : undefined} />
+          <VesselContents masses={tilted} innerR={BEAKER_R - 0.03} floorY={-BEAKER_H / 2 + 0.09} maxLiquidH={BEAKER_H - 0.28} seed={2} liquidWorldY={levelFraction > 0 ? surfaceY : undefined} />
         </group>
       </group>
-      <LabBond from={[lipX, lipY, 0]} to={[lipX + 0.1, receiverTop - 0.22, 0]} radius={0.016} colour="#8dd3e6" />
+      {pouring && <LabBond from={[lipX, lipY, 0]} to={[lipX + 0.1, receiverTop - 0.22, 0]} radius={0.016} colour="#8dd3e6" />}
     </>}
-    <Beaker x={receiverX} radius={0.42} height={0.7} masses={poured && latest ? latest.massesG : emptyMasses()} seed={5} modelTime={modelTime} graduated />
+    <Beaker x={receiverX} radius={0.42} height={0.7} masses={received} seed={5} modelTime={modelTime} graduated />
     <RecoveredRow outputs={state.outputs} exclude={latest} />
   </group>;
 }

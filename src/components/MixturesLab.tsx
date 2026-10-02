@@ -43,6 +43,7 @@ import {
 } from '../science/mixturesEngine';
 import './MixturesLab.css';
 import { watchContextLoss } from './scene/contextLoss';
+import { AdaptiveQuality } from './scene/AdaptiveQuality';
 
 export type { MixturesFocus, MixturesMode } from '../science/mixturesEngine';
 
@@ -579,7 +580,7 @@ export function MixturesLab({ initialMode = 'classify', focus = 'entities', onMo
                 watchContextLoss(gl.domElement, () => { setGraphicsFailed(true); setCanvasReady(false); });
               }}>
                 <MixturesWorld mode={mode} sampleId={sampleId} separation={separation} yandying={yandying} industrial={industrial} modelTime={modelTime} selectedTechnique={selectedTechnique} />
-              </Canvas>
+              <AdaptiveQuality /></Canvas>
             </GraphicsError>}
             {graphicsFailed && <div className="ml-fallback" role="img" aria-label={`Two dimensional ${title.toLowerCase()} model. ${summary}`}>
               {mode === 'culture' ? <div className="ml-fallback-dish"><div className="ml-fallback-seed-group">{Array.from({ length: 16 }, (_, index) => <i key={`seed-${index}`} />)}</div><div className="ml-fallback-chaff-group">{Array.from({ length: 4 }, (_, index) => <i key={`chaff-${index}`} />)}</div></div>

@@ -41,6 +41,7 @@ import {
 } from '../science/solutionsEngine';
 import './SolutionsLab.css';
 import { watchContextLoss } from './scene/contextLoss';
+import { AdaptiveQuality } from './scene/AdaptiveQuality';
 
 export type { SolutionsMode } from '../science/solutionsEngine';
 
@@ -392,7 +393,7 @@ export function SolutionsLab({ initialMode = 'dissolving', onModeChange }: Solut
                 setCanvasReady(true);
                 setGraphicsFailed(false);
                 watchContextLoss(gl.domElement, () => { setGraphicsFailed(true); setCanvasReady(false); });
-              }} fallback={null}><SolutionsWorld state={state} particleView={particleView} /></Canvas>
+              }} fallback={null}><SolutionsWorld state={state} particleView={particleView} /><AdaptiveQuality /></Canvas>
             </ErrorBoundary>}
             {graphicsFailed && <><TwoDimensionalBeaker state={state} plan={solidPlan} particleView={particleView} /><button className="slab-retry" type="button" onClick={retryGraphics}>Try 3D again</button></>}
             <div className="slab-scene-readout"><b>{ledger.dissolvedG.toFixed(1)} g</b><i /> <span>dissolved</span><small>{ledger.undissolvedG.toFixed(1)} g solid</small></div>
@@ -445,7 +446,7 @@ export function SolutionsLab({ initialMode = 'dissolving', onModeChange }: Solut
 
           {state.mode === 'temperature' && <section className="slab-temperature-panel"><div className="slab-section-head"><div><span className="slab-kicker">TEMPERATURE COMPARISON</span><b>Same solvent amount · different curves</b></div></div><SolubilityGraph selected={state.soluteId} trials={[]} /><p className="slab-experiment-plan">The published classroom table shows sucrose capacity rising much more steeply than sodium chloride. These curves describe capacity, not dissolving speed.</p></section>}
 
-          {state.mode === 'particles' && <section className="slab-particle-panel"><div className="slab-section-head"><div><span className="slab-kicker">PARTICLE THEORY</span><b>{SOLUTES[state.soluteId].kind === 'ionic' ? 'Ions separate' : SOLUTES[state.soluteId].kind === 'molecular' ? 'Whole molecules spread out' : 'Solid grains remain separate'}</b></div></div><p>{vocabContent(state)}</p><div className="slab-particle-key"><span><i className="water-key" />Water molecule · H₂O</span>{SOLUTES[state.soluteId].kind === 'ionic' ? <><span><i className={state.soluteId === 'salt' ? 'sodium-key' : 'potassium-key'} />{SOLUTES[state.soluteId].cation} ion</span><span><i className="chloride-key" />{SOLUTES[state.soluteId].anion} ion</span></> : <span><i className="solute-key" />{SOLUTES[state.soluteId].name} particles</span>}</div><small>Dots and molecules are schematic markers, not a literal count of all particles.</small></section>}
+          {state.mode === 'particles' && <section className="slab-particle-panel"><div className="slab-section-head"><div><span className="slab-kicker">PARTICLE THEORY</span><b>{SOLUTES[state.soluteId].kind === 'ionic' ? 'Ions separate' : SOLUTES[state.soluteId].kind === 'molecular' ? 'Whole molecules spread out' : 'Solid grains remain separate'}</b></div></div><p>{vocabContent(state)}</p><div className="slab-particle-key"><span><i className="water-key" />Water molecule · H₂O</span>{SOLUTES[state.soluteId].kind === 'ionic' ? <><span><i className={state.soluteId === 'salt' ? 'sodium-key' : 'potassium-key'} />{SOLUTES[state.soluteId].cation} ion</span><span><i className="chloride-key" />{SOLUTES[state.soluteId].anion} ion</span><span><i className="hydration-key" />Hydration shell: water around a leaving ion</span></> : <span><i className="solute-key" />{SOLUTES[state.soluteId].name} particles</span>}</div><small>Dots and molecules are schematic markers, not a literal count of all particles.</small></section>}
 
           {state.mode === 'comparison' && <section className="slab-comparison-panel"><div className="slab-section-head"><div><span className="slab-kicker">MATCHED CONCENTRATION COMPARISON</span><b>{relationLabel}</b></div></div><div className="slab-preset-grid">{(['dilute', 'concentrated', 'saturated'] as const).map((preset) => <button type="button" key={preset} className={activeComparisonPreset === preset ? 'active' : ''} onClick={() => loadPreset(preset)}><b>{preset[0].toUpperCase() + preset.slice(1)}</b><small>{preset === 'dilute' ? 'A 40 g vs B 150 g' : preset === 'concentrated' ? 'A 150 g vs B 40 g' : 'A at capacity vs B 40 g'}</small></button>)}</div>
             <div className="slab-comparison-readings"><div><span>Sample A · current</span><b>{ledger.dissolvedG.toFixed(1)} g / {state.solventMassG} g water</b><small>{stateCondition}</small></div><div><span>Sample B · reference</span><b>{state.comparisonReference ? `${state.comparisonReference.dissolvedG.toFixed(1)} g / ${state.comparisonReference.solventMassG} g water` : 'No matched reference yet'}</b><small>{state.comparisonReference ? `Same ${SOLUTES[state.soluteId].formula} · ${state.comparisonReference.temperatureC} °C` : 'Choose a comparison above'}</small></div></div>

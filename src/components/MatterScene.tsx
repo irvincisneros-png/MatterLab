@@ -5,6 +5,7 @@ import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeom
 import * as THREE from 'three';
 import { ATOM_COLOURS, LabBeaker, StudioLights } from './scene/LabPrimitives';
 import { LatticeLinks } from './scene/StatesLattice';
+import { AdaptiveQuality } from './scene/AdaptiveQuality';
 import {
   CHAMBER,
   deriveMoleculePositions,
@@ -347,7 +348,7 @@ export function MatterScene({
       <PerspectiveCamera makeDefault position={[3, 3.5, 12]} fov={COMPARISON_FOV} near={0.5} far={160} />
       <CameraController preset={cameraPreset} revision={cameraRevision} focusSample={focusSample} selected={selected} />
       <ContextRecovery onContextLost={onContextLost} />
-    </Canvas>
+    <AdaptiveQuality /></Canvas>
   );
 }
 

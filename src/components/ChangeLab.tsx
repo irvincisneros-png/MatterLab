@@ -22,6 +22,7 @@ import {
 import { gasPosition, iceLatticeHeight, iceLatticeSite, liquidDrift, relaxSeparation, SAMPLE_MASS_KG, thermalStateAtEnergy, type Phase } from '../science/matterEngine';
 import './ChangeLab.css';
 import { watchContextLoss } from './scene/contextLoss';
+import { AdaptiveQuality } from './scene/AdaptiveQuality';
 
 export type { TransitionId } from '../science/transitionEngine';
 export type ChangeLabProps = {
@@ -507,7 +508,7 @@ export function ChangeLab({ initialTransition = 'melting', onTransitionChange }:
                 watchContextLoss(canvas, () => { setGraphicsFailed(true); setCanvasReady(false); });
               }} fallback={<span aria-hidden="true">3D view unavailable</span>}>
                 <Instrument state={state} particles={particles} showMolecules={showMolecules} reducedMotion={reduceMotion} viewRevision={viewRevision} heater={heater} />
-              </Canvas>
+              <AdaptiveQuality /></Canvas>
             </ErrorBoundary>}
             {graphicsFailed && <div className="cl-2d-equivalent" role="group" aria-label={`Two dimensional view: ${PHASE_LABELS.solid} ${Math.round(observation.fractions.solid * 100)} percent, ${PHASE_LABELS.liquid} ${Math.round(observation.fractions.liquid * 100)} percent, ${PHASE_LABELS.gas} ${Math.round(observation.fractions.gas * 100)} percent`}>
               <div className="cl-fallback-vessel">

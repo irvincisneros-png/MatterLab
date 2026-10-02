@@ -248,6 +248,25 @@ describe('particle scene model', () => {
     }
   });
 
+  it('marks each hydrated ion with a halo and four oriented waters while it leaves the crystal', () => {
+    const state = { ...dissolvingSalt('coarse'), modelTimeSeconds: 1.2 };
+    const plan = planSolid(state, true);
+    const model = buildDynamicModel(state, plan, true);
+    expect(model.halos.length).toBeGreaterThan(0);
+    expect(model.halos.length).toBeLessThanOrEqual(plan.detachers.length);
+    expect(model.waters.length - 40).toBe(model.halos.length * 4);
+  });
+
+  it('keeps growing the visible excess crystal beyond 24 g of undissolved salt', () => {
+    const sites = (grams: number) => {
+      // Saturated at 20 °C (36 g dissolved) with `grams` of excess solid on the floor.
+      const saturated = { ...addSolute(createSolutionsState('dissolving', 'salt'), 36 + grams), dissolvedG: 36 };
+      const model = buildSolidModel(planSolid(saturated, false));
+      return model.cations.length + model.anions.length;
+    };
+    expect(sites(40)).toBeGreaterThan(sites(24));
+  });
+
   it('keeps dissolved marker counts tied to dissolved mass and never splits sucrose', () => {
     let state = setStirring(addSolute(createSolutionsState('dissolving', 'salt'), 25), true);
     state = advanceSolutions(state, 30);
