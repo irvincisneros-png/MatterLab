@@ -74,7 +74,7 @@ export function SyllabusMenu() {
         <div className="syllabus-extra-links"><a href="#/advanced/plasma">Hydrogen plasma <ArrowRight size={15} /></a><a href="#/advanced/bec">Bose–Einstein condensate <ArrowRight size={15} /></a></div>
       </section>
 
-      <footer className="syllabus-footer">Follow the sequence or jump straight to the activity you need.</footer>
+      <footer className="syllabus-footer">Follow the sequence or jump straight to the activity you need. <a className="syllabus-hub-link" href="https://irvincisneros-png.github.io/">← Learning Hub</a></footer>
     </section>
   );
 }

@@ -62,6 +62,8 @@
 .syllabus-extra-links { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
 .syllabus-extra-links a { min-height: 36px; display: inline-flex; align-items: center; gap: 7px; padding: 0 10px; border: 1px solid #c8c1ec; border-radius: 10px; color: #5342a7; text-decoration: none; background: #fff; font-size: 11px; font-weight: 730; }
 .syllabus-footer { margin: 14px 2px 0; color: #637b95; font-size: 11px; line-height: 1.45; }
+.syllabus-hub-link { margin-left: 8px; color: #2f6fb0; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.syllabus-hub-link:hover, .syllabus-hub-link:focus-visible { text-decoration: underline; }
 
 @media (max-width: 760px) {
   .syllabus-hero { min-height: 200px; padding: 25px; }
